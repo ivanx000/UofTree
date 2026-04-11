@@ -138,3 +138,11 @@ CORS_ALLOWED_ORIGINS = [
 GRAPHENE = {
     'SCHEMA': 'courses.schema.schema',
 }
+
+# ── Search behavior ───────────────────────────────────────────────────────────
+SEARCH_RESULTS_LIMIT = 25
+
+# Optional fallback to UofT timetable API for broader course search coverage.
+UOFT_TIMETABLE_FALLBACK_ENABLED = True
+UOFT_TIMETABLE_SESSION = '20249'
+UOFT_TIMETABLE_TIMEOUT_SECONDS = 4
