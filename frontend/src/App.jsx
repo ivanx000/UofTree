@@ -11,8 +11,8 @@ export default function App() {
         className="w-full py-4 px-8"
         style={{ backgroundColor: '#00205b' }}
       >
-        <div className="max-w-6xl mx-auto flex items-center">
-          <h1 className="text-white font-bold text-xl">UofTree</h1>
+        <div className="flex items-center pl-2">
+          <h1 className="text-white font-bold text-lg">University of Toronto</h1>
         </div>
       </nav>
 
@@ -20,16 +20,14 @@ export default function App() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12 w-full">
         <div className="w-full max-w-2xl text-center">
           <h1
-            className="font-bold leading-tight mb-8"
+            className="font-bold leading-tight mb-8 text-center"
             style={{
               fontSize: 'clamp(2rem, 4.2vw, 3.6rem)',
               color: '#000000',
+              textAlign: 'center',
             }}
           >
-            <span style={{ display: 'block', whiteSpace: 'nowrap' }}>
-              Explore prerequisite trees from
-            </span>
-            <span>University of Toronto courses</span>
+            Explore Course Prerequisites
           </h1>
 
           <div className="w-full">

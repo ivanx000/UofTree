@@ -66,14 +66,14 @@ export default function SearchBar({ onSearch, landing = false }) {
             className="w-full pl-11 pr-4 py-3.5 rounded-xl text-gray-800 text-sm outline-none transition"
             style={{
               background: 'rgba(255,255,255,0.97)',
-              boxShadow: '0 0 0 3px rgba(0, 51, 160, 0), 0 0 12px rgba(0, 51, 160, 0)',
+              boxShadow: '0 0 0 3px rgba(0, 51, 160, 0.2), 0 0 12px rgba(0, 51, 160, 0.4)',
               fontSize: '15px',
             }}
             onFocusCapture={e => {
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 51, 160, 0.2), 0 0 12px rgba(0, 51, 160, 0.4)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 51, 160, 0.3), 0 0 16px rgba(0, 51, 160, 0.5)'
             }}
             onBlurCapture={e => {
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 51, 160, 0), 0 0 12px rgba(0, 51, 160, 0)'
+              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0, 51, 160, 0.2), 0 0 12px rgba(0, 51, 160, 0.4)'
             }}
           />
         </form>
