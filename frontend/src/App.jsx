@@ -42,12 +42,12 @@ export default function App() {
         }}
       />
 
-      {/* ── Gradient overlay ─────────────────────────────────────────────── */}
+      {/* ── Dark overlay ─────────────────────────────────────────────────── */}
       <div
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(255, 255, 255, 0.78)',
+          background: 'rgba(10, 15, 45, 0.88)',
           zIndex: 1,
         }}
       />
@@ -71,33 +71,50 @@ export default function App() {
             padding: '0 1.5rem',
           }}
         >
-          {/* Spacer — collapses when a course is found, sliding everything up */}
+          {/* Spacer — centres content on load, collapses to slide everything up */}
           <div
             style={{
               flexShrink: 0,
-              height: hasCourse ? '0' : 'calc(30vh - 80px)',
+              height: hasCourse ? '2rem' : 'calc(50vh - 140px)',
               transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
 
-          {/* Search + heading */}
-          <div style={{ width: '100%', maxWidth: '640px', margin: '0 auto' }}>
-            {/* Heading — fades out and collapses once a result appears */}
+          {/* Title + Search */}
+          <div style={{ width: '100%', maxWidth: '700px', margin: '0 auto' }}>
+
+            {/* Heading */}
             <h1
               style={{
-                fontSize: 'clamp(2rem, 4.2vw, 3.6rem)',
-                fontWeight: 700,
-                color: '#000000',
+                fontWeight: 800,
+                lineHeight: 1.1,
                 textAlign: 'center',
-                lineHeight: 1.15,
                 opacity: hasCourse ? 0 : 1,
-                maxHeight: hasCourse ? '0' : '120px',
-                marginBottom: hasCourse ? 0 : '2rem',
+                maxHeight: hasCourse ? '0' : '180px',
+                marginBottom: hasCourse ? 0 : '1.75rem',
                 overflow: 'hidden',
                 transition: 'opacity 0.4s ease, max-height 0.6s ease, margin-bottom 0.4s ease',
               }}
             >
-              Explore Course Prerequisites
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
+                  color: '#ffffff',
+                }}
+              >
+                Explore course prerequisites
+              </span>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 'clamp(2rem, 4.5vw, 3.8rem)',
+                  color: '#ffffff',
+                }}
+              >
+                at{' '}
+                <span style={{ color: '#5B9BD5' }}>University of Toronto</span>
+              </span>
             </h1>
 
             <SearchBar onSearch={handleSearch} landing />
@@ -109,7 +126,7 @@ export default function App() {
               style={{
                 textAlign: 'center',
                 marginTop: '2rem',
-                color: 'rgba(0,0,0,0.45)',
+                color: 'rgba(255,255,255,0.45)',
                 fontSize: '0.875rem',
               }}
             >
@@ -122,7 +139,7 @@ export default function App() {
               style={{
                 textAlign: 'center',
                 marginTop: '2rem',
-                color: '#dc2626',
+                color: '#f87171',
                 fontSize: '0.875rem',
               }}
             >
@@ -135,12 +152,12 @@ export default function App() {
               style={{
                 textAlign: 'center',
                 marginTop: '2rem',
-                color: 'rgba(0,0,0,0.45)',
+                color: 'rgba(255,255,255,0.45)',
                 fontSize: '0.875rem',
               }}
             >
               Course{' '}
-              <span style={{ fontFamily: 'monospace', color: '#b45309' }}>{queriedCode}</span>{' '}
+              <span style={{ fontFamily: 'monospace', color: '#fbbf24' }}>{queriedCode}</span>{' '}
               was not found.
             </p>
           )}
@@ -165,12 +182,12 @@ export default function App() {
                       fontFamily: 'monospace',
                       fontWeight: 700,
                       fontSize: '1.1rem',
-                      color: '#b45309',
+                      color: '#FFD700',
                     }}
                   >
                     {course.code}
                   </p>
-                  <p style={{ fontSize: '0.875rem', color: 'rgba(0,0,0,0.6)', marginTop: '0.25rem' }}>
+                  <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.55)', marginTop: '0.25rem' }}>
                     {course.name}
                   </p>
                 </div>
