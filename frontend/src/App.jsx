@@ -47,7 +47,7 @@ export default function App() {
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(255, 255, 255, 0.78)',
+          background: 'rgba(255, 255, 255, 0.52)',
           zIndex: 1,
         }}
       />
@@ -75,7 +75,7 @@ export default function App() {
           <div
             style={{
               flexShrink: 0,
-              height: hasCourse ? '2rem' : '12vh',
+              height: hasCourse ? '2rem' : 'calc(50vh - 110px)',
               transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           />
@@ -112,8 +112,14 @@ export default function App() {
                   color: '#000000',
                 }}
               >
-                at{' '}
-                <span style={{ color: '#00205b' }}>University of Toronto</span>
+                at the{' '}
+                <span style={{
+                  background: 'linear-gradient(135deg, #4a90d9 0%, #0033a0 60%, #00205b 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  filter: 'drop-shadow(0 0 8px rgba(74, 144, 217, 0.65))',
+                }}>University of Toronto</span>
               </span>
             </h1>
 
