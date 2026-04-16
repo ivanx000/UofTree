@@ -34,7 +34,7 @@ Notes
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from courses.catalog import _normalize_course, fetch_timetable_courses_by_prefix
+from courses.catalog import fetch_timetable_courses_by_prefix
 from courses.models import Course
 
 # Complete list of Arts & Science + Engineering department codes at UofT.
@@ -125,12 +125,12 @@ class Command(BaseCommand):
             return
 
         # ── Pass 2: upsert courses ────────────────────────────────────────────
+        # fetch_timetable_courses_by_prefix already returns normalised dicts.
         normalized_map: dict[str, dict] = {}
         created_count = 0
         skipped_count = 0
 
-        for code, payload in raw_payloads.items():
-            normalized = _normalize_course(code, payload)
+        for code, normalized in raw_payloads.items():
             if not normalized:
                 continue
             normalized_map[normalized['code']] = normalized
