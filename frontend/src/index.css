@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar everywhere while keeping scroll functional */
+html, body {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
 /* Prevent React Flow from showing a white background */
 .react-flow__renderer {
   background: transparent !important;

@@ -7,18 +7,6 @@ from .catalog import fetch_timetable_course_by_code, search_timetable_courses
 
 
 class CourseType(DjangoObjectType):
-    """
-    Recursive GraphQL type for Course.
-
-    N+1 Strategy
-    ─────────────
-    The root resolvers (resolve_course / resolve_courses) call
-    .prefetch_related() three levels deep. Django executes exactly
-    4 SQL statements total regardless of tree size. Every recursive
-    call to resolve_prerequisites reads from the in-memory prefetch
-    cache — no additional SQL per node.
-    """
-
     class Meta:
         model = Course
         fields = ('id', 'code', 'name', 'description', 'prerequisites')
@@ -26,12 +14,10 @@ class CourseType(DjangoObjectType):
     prerequisites = graphene.List(lambda: CourseType)
 
     def resolve_prerequisites(self, info):
-        # Hits the prefetch cache — O(1), no SQL
         return self.prerequisites.all()
 
 
 def _prefetch_course(code):
-    """Return a Course from DB with 3-level prerequisite prefetch."""
     return (
         Course.objects
         .prefetch_related(
@@ -43,16 +29,55 @@ def _prefetch_course(code):
     )
 
 
-def _save_remote_course(remote):
+def _sync_prerequisites(course, known_codes=None, depth=0, max_depth=3):
     """
-    Persist a course dict returned by the timetable API fallback.
+    Wire prerequisite courses onto `course`, fetching from EASI any that
+    are not yet in the DB.  Recurses up to max_depth levels.
 
-    • Creates the course if it doesn't exist yet (never overwrites existing
-      records so manually curated data is preserved).
-    • On first creation, wires up any prerequisites whose codes are already
-      present in the local database.
-    • Returns the db-backed Course with prerequisite prefetch applied.
+    known_codes — pass when the caller already has the prerequisite code list
+                  (avoids a redundant API round-trip for the parent course).
     """
+    if not settings.UOFT_TIMETABLE_FALLBACK_ENABLED:
+        return
+
+    if known_codes is None:
+        remote = fetch_timetable_course_by_code(
+            code=course.code,
+            session=settings.UOFT_TIMETABLE_SESSION,
+            timeout=settings.UOFT_TIMETABLE_TIMEOUT_SECONDS,
+        )
+        if not remote:
+            return
+        prereq_codes = remote.get('prerequisite_codes') or []
+    else:
+        prereq_codes = known_codes
+
+    for prereq_code in prereq_codes:
+        try:
+            prereq = Course.objects.get(code=prereq_code)
+        except Course.DoesNotExist:
+            if depth >= max_depth:
+                continue
+            remote_prereq = fetch_timetable_course_by_code(
+                code=prereq_code,
+                session=settings.UOFT_TIMETABLE_SESSION,
+                timeout=settings.UOFT_TIMETABLE_TIMEOUT_SECONDS,
+            )
+            if not remote_prereq:
+                continue
+            prereq, created = Course.objects.get_or_create(
+                code=remote_prereq['code'],
+                defaults={
+                    'name': remote_prereq['name'],
+                    'description': remote_prereq['description'],
+                },
+            )
+            if created:
+                _sync_prerequisites(prereq, known_codes=remote_prereq.get('prerequisite_codes'), depth=depth + 1, max_depth=max_depth)
+        course.prerequisites.add(prereq)
+
+
+def _save_remote_course(remote):
     course, created = Course.objects.get_or_create(
         code=remote['code'],
         defaults={
@@ -60,15 +85,8 @@ def _save_remote_course(remote):
             'description': remote['description'],
         },
     )
-
     if created:
-        for prereq_code in remote.get('prerequisite_codes') or []:
-            try:
-                prereq = Course.objects.get(code=prereq_code)
-                course.prerequisites.add(prereq)
-            except Course.DoesNotExist:
-                pass  # prerequisite not imported yet — skip silently
-
+        _sync_prerequisites(course, known_codes=remote.get('prerequisite_codes'))
     return _prefetch_course(course.code)
 
 
@@ -76,41 +94,23 @@ class Query(graphene.ObjectType):
     course = graphene.Field(
         CourseType,
         code=graphene.String(required=True),
-        description='Fetch a single course and its full recursive prerequisite tree.',
     )
     courses = graphene.List(
         CourseType,
         search=graphene.String(default_value=''),
-        description='List all courses, optionally filtered by search string.',
     )
 
     def resolve_course(self, info, code):
         try:
             course = _prefetch_course(code)
-            # If course is in DB but has no prerequisites, try to wire them from the API.
-            # This handles the case where the course was first fetched before its prereqs existed.
+            # Re-sync if course is cached but has no prerequisites wired yet.
             if not course.prerequisites.exists() and settings.UOFT_TIMETABLE_FALLBACK_ENABLED:
-                remote = fetch_timetable_course_by_code(
-                    code=code,
-                    session=settings.UOFT_TIMETABLE_SESSION,
-                    timeout=settings.UOFT_TIMETABLE_TIMEOUT_SECONDS,
-                )
-                if remote:
-                    linked = False
-                    for prereq_code in remote.get('prerequisite_codes') or []:
-                        try:
-                            prereq = Course.objects.get(code=prereq_code)
-                            course.prerequisites.add(prereq)
-                            linked = True
-                        except Course.DoesNotExist:
-                            pass
-                    if linked:
-                        return _prefetch_course(code)
+                _sync_prerequisites(course)
+                return _prefetch_course(code)
             return course
         except Course.DoesNotExist:
             if not settings.UOFT_TIMETABLE_FALLBACK_ENABLED:
                 return None
-
             remote = fetch_timetable_course_by_code(
                 code=code,
                 session=settings.UOFT_TIMETABLE_SESSION,
@@ -118,7 +118,6 @@ class Query(graphene.ObjectType):
             )
             if not remote:
                 return None
-
             return _save_remote_course(remote)
 
     def resolve_courses(self, info, search=''):
