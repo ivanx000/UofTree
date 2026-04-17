@@ -5,8 +5,8 @@ import FlowVisualizer from './components/FlowVisualizer'
 import { GET_COURSE } from './graphql/queries'
 import bgVideo from './assets/14471921_3840_2160_30fps.mp4'
 
-const EXIT_LANDING_MS = 600
-const EXIT_TREE_MS    = 600
+const EXIT_LANDING_MS = 650
+const EXIT_TREE_MS    = 750
 
 export default function App() {
   const [queriedCode, setQueriedCode]     = React.useState(null)
@@ -76,7 +76,7 @@ export default function App() {
 
       {/* ── Landing — also rendered during exit-tree so it slides in simultaneously ── */}
       {(!showTree || exitingTree) && (
-        <div style={{ position: 'relative', zIndex: 2, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: exitingTree ? 'fixed' : 'relative', ...(exitingTree ? { inset: 0 } : {}), zIndex: 2, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: '0 1.5rem' }}>
 
             <div style={{ flexShrink: 0, height: 'calc(50vh - 110px)' }} />

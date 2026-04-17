@@ -57,7 +57,7 @@ body::-webkit-scrollbar {
   to   { transform: translateY(0); }
 }
 .landing-slide-down {
-  animation: landing-slide-down 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: landing-slide-down 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Animated blue glow for the focused search bar */
